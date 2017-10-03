@@ -29,6 +29,10 @@ module NewRelic::Sidekiq
       @jobs_processed = NewRelic::Processor::EpochCounter.new
     end
 
+    def stats
+      @sidekiq_stats
+    end
+
     def setup_sidekiq
       redis_configuration = { url: uri }
       redis_configuration.merge!(password: password) if password
@@ -68,4 +72,3 @@ module NewRelic::Sidekiq
 
   NewRelic::Plugin::Run.setup_and_run
 end
-
