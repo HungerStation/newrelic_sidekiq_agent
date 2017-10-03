@@ -13,7 +13,7 @@ module NewRelic::Sidekiq
 
     agent_guid 'com.eksoverzero.newrelic-sidekiq-agent'
     agent_config_options :name, :uri, :password, :namespace
-    agent_version '1.1.1'
+    agent_version '1.6.1'
     agent_human_labels('Sidekiq') { name }
 
     attr_reader :sidekiq_stats, :sidekiq_workers
@@ -27,10 +27,6 @@ module NewRelic::Sidekiq
     def setup_metrics
       @jobs_failed    = NewRelic::Processor::EpochCounter.new
       @jobs_processed = NewRelic::Processor::EpochCounter.new
-    end
-
-    def stats
-      @sidekiq_stats
     end
 
     def setup_sidekiq
@@ -49,10 +45,10 @@ module NewRelic::Sidekiq
       report_metric 'Jobs/Count/Failed',    'Jobs',     sidekiq_stats.failed || 0
       report_metric 'Jobs/Count/Scheduled', 'Jobs',     sidekiq_stats.scheduled_size || 0
       report_metric 'Jobs/Count/Retries',   'Jobs',     sidekiq_stats.retry_size || 0
-      report_metric 'Jobs/Rate/Processed',  'Jobs/sec', @jobs_processed.process(stats.processed || 0)
-      report_metric 'Jobs/Rate/Failed',     'Jobs/sec', @jobs_failed.process(stats.failed || 0)
+      report_metric 'Jobs/Rate/Processed',  'Jobs/sec', @jobs_processed.process(sidekiq_stats.processed) || 0
+      report_metric 'Jobs/Rate/Failed',     'Jobs/sec', @jobs_failed.process(sidekiq_stats.failed) || 0
 
-      stats.queues.each do |name, enqueued|
+      sidekiq_stats.queues.each do |name, enqueued|
         report_metric "Queues/#{name}", 'Enqueued',  enqueued || 0
         report_metric "Queues/#{name}", 'Latency',   Sidekiq::Queue.new(name).latency || 0
       end
