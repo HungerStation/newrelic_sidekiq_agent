@@ -37,7 +37,7 @@ module NewRelic::Sidekiq
 
     def poll_cycle
       report_metric 'Workers/Working',      'Workers',  sidekiq_workers.size.to_i
-      report_metric 'Jobs/Count/Pending',   'Jobs',     sidekiq_stats.enqueued.to_i
+      report_metric 'Jobs/Count/Pending',   'Jobs',     sidekiq_stats.queues.values.sum.to_i
       report_metric 'Jobs/Count/Processed', 'Jobs',     sidekiq_stats.processed.to_i
       report_metric 'Jobs/Count/Failed',    'Jobs',     sidekiq_stats.failed.to_i
       report_metric 'Jobs/Count/Scheduled', 'Jobs',     sidekiq_stats.scheduled_size.to_i
