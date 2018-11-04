@@ -25,7 +25,7 @@ module NewRelic::Sidekiq
     end
 
     def setup_sidekiq
-      redis_configuration = { url: uri }
+      redis_configuration = { url: uri, id: nil }
       redis_configuration.merge!(password: password) if password
       redis_configuration.merge!(namespace: namespace) if namespace
       Sidekiq.configure_client { |config| config.redis = redis_configuration }

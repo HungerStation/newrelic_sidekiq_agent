@@ -1,0 +1,36 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  annotations:
+  labels:
+    app: platform-sidekiq-redis-agent
+  name: production-platform-sidekiq-redis-agent
+spec:
+  selector:
+    matchLabels:
+      app: platform-sidekiq-redis-agent
+  template:
+    metadata:
+      labels:
+        app: platform-sidekiq-redis-agent
+    spec:
+      containers:
+      - image: gcr.io/hungerstation-configs/platform-sidekiq-redis-agent:latest
+        imagePullPolicy: Always
+        lifecycle:
+          preStop:
+            exec:
+              command:
+              - kill -s TERM 1
+        name: production-platform-sidekiq-redis-agent
+        volumeMounts:
+        - mountPath: /home/newrelic_sidekiq_agent/config/newrelic_plugin.yml
+          name: config
+          readOnly: true
+          subPath: newrelic_plugin.yml
+      restartPolicy: Always
+      terminationGracePeriodSeconds: 30
+      volumes:
+      - name: config
+        configMap:
+          name: platform-sidekiq-redis-agent-config
